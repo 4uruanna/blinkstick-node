@@ -1,0 +1,12 @@
+{
+  "name": "blinkstick-node",
+  "version": "0.1.0",
+  "description": "",
+  "type": "module",
+  "keywords": ["blinkstick", "hid"],
+  "author": "4uruanna",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "node-hid": "^3.2.0"
+  }
+}
