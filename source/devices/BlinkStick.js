@@ -1,7 +1,7 @@
 import hid from "node-hid";
-import Rgb from "../Rgb.js";
 import CONSTANTS from "../constants.js";
 import HidDevice from "./Hid.js";
+import Rgb from "../colors/Rgb.js";
 
 export class BlinkStick extends HidDevice {
     /**
@@ -28,7 +28,7 @@ export class BlinkStick extends HidDevice {
      * Find BlinkStick device based on serial number
      *
      * @param {string} serialNumber
-     * @returns {BlinkStick}
+     * @returns {BlinkStick|undefined}
      */
     static findBySerial(serialNumber) {
         const deviceList = BlinkStick.findDevices();
@@ -44,11 +44,35 @@ export class BlinkStick extends HidDevice {
         return result;
     }
 
+    /** @type {number} */
+    ledCount = 1;
+
     /**
      * @param {hid.Device} device
      */
     constructor(device)
     {
         super(device);
+    }
+
+    /**
+     * Shutdown all leds
+     * 
+     * @returns {Promise<boolean>}
+     */
+    shutdown() {
+        return new Promise((resolve, reject) => {
+            let result = false;
+
+            if(this.isConnected()) {
+                for(const index of Array(this.ledCount).keys()) {
+                    this.setColor(Rgb.BLACK, index);
+                }
+
+                result = true;
+            }
+
+            resolve(result);
+        });
     }
 }
