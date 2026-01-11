@@ -193,4 +193,46 @@ export class BlinkStick extends HidDevice {
 
         return result;
     }
+
+    /**
+     * Get the product model of the device.
+     *
+     * @return {{ id: number, release: undefined|number, name: string }}
+     */
+    getModel() {
+        const version = this.getVersion();
+        let result = CONSTANTS.PRODUCT.UNKNOWN;
+
+        switch(version.major) {
+            case 1:
+                result = CONSTANTS.PRODUCT.BLINKSTICK;
+                break;
+            
+            case 2:
+                result = CONSTANTS.PRODUCT.BLINKSTICK_PRO;
+                break;
+
+            case 3:
+                switch(this.device.release) {
+                    case CONSTANTS.PRODUCT.BLINKSTICK_SQUARE.release:
+                        result = CONSTANTS.PRODUCT.BLINKSTICK_SQUARE;
+                        break;
+
+                    case CONSTANTS.PRODUCT.BLINKSTICK_STRIP.release:
+                        result = CONSTANTS.PRODUCT.BLINKSTICK_STRIP;
+                        break;
+                        
+                    case CONSTANTS.PRODUCT.BLINKSTICK_NANO.release:
+                        result = CONSTANTS.PRODUCT.BLINKSTICK_NANO;
+                        break
+
+                    case CONSTANTS.PRODUCT.BLINKSTICK_FLEX.release:
+                        result = CONSTANTS.PRODUCT.BLINKSTICK_FLEX;
+                        break;
+                }
+                break;
+        }
+
+        return result;
+    }
 }
