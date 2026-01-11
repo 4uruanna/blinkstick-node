@@ -125,4 +125,26 @@ export class BlinkStick extends HidDevice {
             resolve(result);
         });
     }
+
+    /**
+     * Get visible color of each led
+     *
+     * @returns {Promise<{ [key:number]: Rgb|undefined }>}
+     */
+    async getLedsColors() {
+        const   promises = [],
+                result = {};
+
+        for(const index of Array(this.ledCount).keys()) {
+            promises.push(this.getLedColor(index));
+        }
+
+        const colors = await Promise.all(promises);
+
+        for(let i=0; i<colors.length; i++) {
+            result[i] = colors[i];
+        }
+
+        return result;
+    }
 }
