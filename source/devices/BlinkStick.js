@@ -1,7 +1,6 @@
 import hid from "node-hid";
 import CONSTANTS from "../constants.js";
 import Rgb from "../colors/Rgb.js";
-import BLINKSTICK from "../constants.js";
 import HidDevice from "./HidDevice.js";
 
 export class BlinkStick extends HidDevice {
@@ -90,7 +89,7 @@ export class BlinkStick extends HidDevice {
             let result = [];
 
             if(this.isConnected()) {
-                result = this.hid.getFeatureReport(id, BLINKSTICK.FEATURE_REPORT_LENGTH);
+                result = this.hid.getFeatureReport(id, CONSTANTS.FEATURE_REPORT_LENGTH);
             } else {
                 reject();
             }
@@ -146,5 +145,27 @@ export class BlinkStick extends HidDevice {
         }
 
         return result;
+    }
+
+    /**
+     * Get color of an led from its index
+     * 
+     * @param {Rgb} color 
+     * @param {number} index 
+     * @returns {Promise<void>}
+     */
+    setLedColor(color, index=0) {
+        new Promise((resolve,) => {
+            this.hid.sendFeatureReport([
+                CONSTANTS.ADDRESS_BLOCK_SET_COLOR,
+                0,
+                index,
+                color.red,
+                color.green,
+                color.blue
+            ]);
+
+            resolve();
+        });
     }
 }
