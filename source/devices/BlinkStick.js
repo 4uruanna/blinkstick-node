@@ -168,4 +168,29 @@ export class BlinkStick extends HidDevice {
             resolve();
         });
     }
+
+    /**
+     * Returns the serial number of device.
+     *
+     * ```
+     * BSnnnnnn-1.0
+     * ||  |    | |- Software minor version
+     * ||  |    |--- Software major version
+     * ||  |-------- Denotes sequential number
+     * ||----------- Denotes BlinkStick device
+     * ```
+     *
+     * @returns {{ major: number|undefined, minor: number|undefined }}
+     */
+    getVersion() {
+        const   serial = this.device.serialNumber,
+                result = { major: undefined, minor: undefined };
+
+        if(serial) {
+            result.major = parseInt(this.device.serialNumber.at(CONSTANTS.VERSION_MAJOR));
+            result.minor = parseInt(this.device.serialNumber.at(CONSTANTS.VERSION_MINOR));
+        }
+
+        return result;
+    }
 }
