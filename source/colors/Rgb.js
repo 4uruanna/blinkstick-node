@@ -1,6 +1,8 @@
+import CONSTANTS from "../constants.js";
+
 export default class Rgb
 {
-    static BLACK = new Rgb();
+    static BLACK = new Rgb(0, 0, 0);
 
     static RED = new Rgb(255, 0, 0);
 
@@ -27,14 +29,14 @@ export default class Rgb
     blue = 0;
 
     /**
-     * @param {number|undefined} r Red color intensity 0 is off, 255 is full red intensity.
-     * @param {number|undefined} g Green color intensity 0 is off, 255 is full green intensity.
-     * @param {number|undefined} b Blue color intensity 0 is off, 255 is full blue intensity.
+     * @param {number|undefined} red color intensity 0 is off, 255 is full red intensity.
+     * @param {number|undefined} green color intensity 0 is off, 255 is full green intensity.
+     * @param {number|undefined} blue color intensity 0 is off, 255 is full blue intensity.
      */
-    constructor(r=0, g=0, b=0)
+    constructor(red, green, blue)
     {
-        this.red = Math.max(Math.min(r, 255), 0);
-        this.green = Math.max(Math.min(g, 255), 0);
-        this.blue = Math.max(Math.min(b, 255), 0);
+        this.red = Math.max(Math.min(red, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
+        this.green = Math.max(Math.min(green, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
+        this.blue = Math.max(Math.min(blue, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
     }
 }
