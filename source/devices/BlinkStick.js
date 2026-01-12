@@ -245,16 +245,62 @@ export class BlinkStick extends HidDevice {
     }
 
     /**
+     * Set infoblock.
+     * 
+     * @param {number} reportId 
+     * @param {string} data 
+     */
+    setInfoBlock(reportId, data) {
+        const   length = Math.min(data.length, CONSTANTS.FEATURE_REPORT_LENGTH),
+                buffer = Buffer.alloc(CONSTANTS.FEATURE_REPORT_LENGTH);
+
+        buffer[0] = reportId;
+
+        for(let i=0 ; i<length ; i++) {
+            buffer[i+1] = data.charCodeAt(i);
+        }
+
+        this.hid.sendFeatureReport(buffer);
+    }
+
+    /**
+     * Get infoblock.
+     *
+     * @param {number} reportId 
+     * @returns {Promise<string>}
+     */
+    async getInfoBlock(blockId) {
+        const   buffer = await this.getFeatureReport(blockId),
+                result = Array(); 
+
+        for(let i=1 ; i<buffer.length ; i++) {
+            result.push(String.fromCharCode(buffer[i]));
+        }
+
+        return result.join("");
+
+    }
+
+    /**
      * Get the infoblock1 of the device.
      * 
      * This is a 32 byte array that can contain any data. It's supposed to
      * hold the "Name" of the device making it easier to identify rather than
      * a serial number.
      * 
-     * @returns {Promise<number[]>}
+     * @returns {Promise<string>}
      */
     getInfoBlock1() {
-        return this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_1);
+        return this.getInfoBlock(CONSTANTS.ADDRESS_BLOCK_1);
+    }
+
+    /**
+     * Sets the infoblock 1.
+     *
+     * @param {string} data 
+     */
+    setInfoBlock1(data) {
+        this.setInfoBlock(CONSTANTS.ADDRESS_BLOCK_1, data);
     }
 
     /**
@@ -262,10 +308,19 @@ export class BlinkStick extends HidDevice {
      * 
      * This is a 32 byte array that can contain any data.
      * 
-     * @returns {Promise<number[]>}
+     * @returns {Promise<string>}
      */
     getInfoBlock2() {
-        return this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_2);
+        return this.getInfoBlock(CONSTANTS.ADDRESS_BLOCK_2);
+    }
+
+    /**
+     * Sets the infoblock 2.
+     *
+     * @param {string} data 
+     */
+    setInfoBlock2(data) {
+        this.setInfoBlock(CONSTANTS.ADDRESS_BLOCK_2, data);
     }
 
     /**
