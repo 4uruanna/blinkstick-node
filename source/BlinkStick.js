@@ -1,9 +1,49 @@
 import hid from "node-hid";
-import CONSTANTS from "../constants.js";
-import Rgb from "../colors/Rgb.js";
+import Rgb from "./Rgb.js";
 import HidDevice from "./HidDevice.js";
 
 export class BlinkStick extends HidDevice {
+    static VENDOR_ID = 0x20a0;
+
+    static PRODUCT_ID = 0x41e5;
+
+    static DEFAULT_REPORT_LENGTH = 33;
+
+    static VERSION_MAJOR_POSITION = -3;
+
+    static VERSION_MINOR_POSITION = -1;
+
+    static ADDRESS = {
+        BLOCK_1: 0x0002,
+        BLOCK_2: 0x0003,
+        BLOCK_MODE: 0x0004,
+        BLOCK_SET_COLOR: 0x0005,
+        BLOCK_GET_COLOR_8: 0x0006,
+        BLOCK_GET_COLOR_16: 0x0007,
+        BLOCK_GET_COLOR_32: 0x0008,
+        BLOCK_GET_COLOR_64: 0x0009
+    };
+
+    static PRODUCT = {
+        UNKNOWN: { id: 0, release: undefined, name: "unknown", ledCount: 0 },
+        BLINKSTICK: { id: 1, release: undefined, name: "blinkstick", ledCount: 1 },
+        BLINKSTICK_PRO: { id: 2, release: undefined, name: "blinkstick pro", ledCount: 1 },
+        BLINKSTICK_SQUARE: { id: 3, release: 0x200, name: "blinkstick square", ledCount: 8 },
+        BLINKSTICK_STRIP: { id: 4, release: 0x201, name: "blinkstick strip", ledCount: 8 },
+        BLINKSTICK_NANO: { id: 5, release: 0x202, name: "blinkstick nano", ledCount: 2 },
+        BLINKSTICK_FLEX: { id: 6, release: 0x203, name: "blinkstick flex", ledCount: 32 },
+        BLINKSTICK_STRIP_MINI: { id: 7, release: undefined, name: "blinkstick strip mini", ledCount: 4 },
+    };
+    
+    /**
+     * @see http://www.blinkstick.com/help/tutorials/blinkstick-pro-modes
+     */
+    static MODE = {
+       0: "Normal",
+       1: "Inverse",
+       2: "WS2812"
+    };
+
     /**
      * Find all attached BlinkStick devices
      * 
@@ -16,7 +56,7 @@ export class BlinkStick extends HidDevice {
         for (const device of deviceList) {
             const { vendorId, productId } = device;
     
-            if(vendorId === CONSTANTS.VENDOR_ID && productId === CONSTANTS.PRODUCT_ID) {
+            if(vendorId === BlinkStick.VENDOR_ID && productId === BlinkStick.PRODUCT_ID) {
                 result.push(new BlinkStick(device));
             }
         }
@@ -59,12 +99,12 @@ export class BlinkStick extends HidDevice {
         this.ledCount = this.getModel().ledCount;
         this.colorReportId = (
             this.ledCount < 8
-                    ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_8
+                    ? BlinkStick.ADDRESS.BLOCK_GET_COLOR_8
                     : this.ledCount < 16
-                        ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_16
+                        ? BlinkStick.ADDRESS.BLOCK_GET_COLOR_16
                         : this.ledCount < 32
-                            ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_32
-                            : CONSTANTS.ADDRESS_BLOCK_GET_COLOR_64
+                            ? BlinkStick.ADDRESS.BLOCK_GET_COLOR_32
+                            : BlinkStick.ADDRESS.BLOCK_GET_COLOR_64
         );
     }
 
@@ -102,7 +142,7 @@ export class BlinkStick extends HidDevice {
             let result = [];
 
             if(this.isConnected()) {
-                result = this.hid.getFeatureReport(id, CONSTANTS.FEATURE_REPORT_LENGTH);
+                result = this.hid.getFeatureReport(id, BlinkStick.DEFAULT_REPORT_LENGTH);
             } else {
                 reject();
             }
@@ -165,7 +205,7 @@ export class BlinkStick extends HidDevice {
     setLedColor(color, index=0) {
         new Promise((resolve,) => {
             this.hid.sendFeatureReport([
-                CONSTANTS.ADDRESS_BLOCK_SET_COLOR,
+                BlinkStick.ADDRESS.BLOCK_SET_COLOR,
                 0,
                 index,
                 color.red,
@@ -206,8 +246,8 @@ export class BlinkStick extends HidDevice {
                 result = { major: undefined, minor: undefined };
 
         if(serial) {
-            result.major = parseInt(this.device.serialNumber.at(CONSTANTS.VERSION_MAJOR));
-            result.minor = parseInt(this.device.serialNumber.at(CONSTANTS.VERSION_MINOR));
+            result.major = parseInt(this.device.serialNumber.at(BlinkStick.VERSION_MAJOR_POSITION));
+            result.minor = parseInt(this.device.serialNumber.at(BlinkStick.VERSION_MINOR_POSITION));
         }
 
         return result;
@@ -220,33 +260,33 @@ export class BlinkStick extends HidDevice {
      */
     getModel() {
         const version = this.getVersion();
-        let result = CONSTANTS.PRODUCT.UNKNOWN;
+        let result = BlinkStick.PRODUCT.UNKNOWN;
 
         switch(version.major) {
             case 1:
-                result = CONSTANTS.PRODUCT.BLINKSTICK;
+                result = BlinkStick.PRODUCT.BLINKSTICK;
                 break;
             
             case 2:
-                result = CONSTANTS.PRODUCT.BLINKSTICK_PRO;
+                result = BlinkStick.PRODUCT.BLINKSTICK_PRO;
                 break;
 
             case 3:
                 switch(this.device.release) {
-                    case CONSTANTS.PRODUCT.BLINKSTICK_SQUARE.release:
-                        result = CONSTANTS.PRODUCT.BLINKSTICK_SQUARE;
+                    case BlinkStick.PRODUCT.BLINKSTICK_SQUARE.release:
+                        result = BlinkStick.PRODUCT.BLINKSTICK_SQUARE;
                         break;
 
-                    case CONSTANTS.PRODUCT.BLINKSTICK_STRIP.release:
-                        result = CONSTANTS.PRODUCT.BLINKSTICK_STRIP;
+                    case BlinkStick.PRODUCT.BLINKSTICK_STRIP.release:
+                        result = BlinkStick.PRODUCT.BLINKSTICK_STRIP;
                         break;
                         
-                    case CONSTANTS.PRODUCT.BLINKSTICK_NANO.release:
-                        result = CONSTANTS.PRODUCT.BLINKSTICK_NANO;
+                    case BlinkStick.PRODUCT.BLINKSTICK_NANO.release:
+                        result = BlinkStick.PRODUCT.BLINKSTICK_NANO;
                         break
 
-                    case CONSTANTS.PRODUCT.BLINKSTICK_FLEX.release:
-                        result = CONSTANTS.PRODUCT.BLINKSTICK_FLEX;
+                    case BlinkStick.PRODUCT.BLINKSTICK_FLEX.release:
+                        result = BlinkStick.PRODUCT.BLINKSTICK_FLEX;
                         break;
                 }
                 break;
@@ -262,8 +302,8 @@ export class BlinkStick extends HidDevice {
      * @param {string} data 
      */
     setInfoBlock(reportId, data) {
-        const   length = Math.min(data.length, CONSTANTS.FEATURE_REPORT_LENGTH),
-                buffer = Buffer.alloc(CONSTANTS.FEATURE_REPORT_LENGTH);
+        const   length = Math.min(data.length, BlinkStick.DEFAULT_REPORT_LENGTH),
+                buffer = Buffer.alloc(BlinkStick.DEFAULT_REPORT_LENGTH);
 
         buffer[0] = reportId;
 
@@ -302,7 +342,7 @@ export class BlinkStick extends HidDevice {
      * @returns {Promise<string>}
      */
     getInfoBlock1() {
-        return this.getInfoBlock(CONSTANTS.ADDRESS_BLOCK_1);
+        return this.getInfoBlock(BlinkStick.ADDRESS.BLOCK_1);
     }
 
     /**
@@ -311,7 +351,7 @@ export class BlinkStick extends HidDevice {
      * @param {string} data 
      */
     setInfoBlock1(data) {
-        this.setInfoBlock(CONSTANTS.ADDRESS_BLOCK_1, data);
+        this.setInfoBlock(BlinkStick.ADDRESS.BLOCK_1, data);
     }
 
     /**
@@ -322,7 +362,7 @@ export class BlinkStick extends HidDevice {
      * @returns {Promise<string>}
      */
     getInfoBlock2() {
-        return this.getInfoBlock(CONSTANTS.ADDRESS_BLOCK_2);
+        return this.getInfoBlock(BlinkStick.ADDRESS.BLOCK_2);
     }
 
     /**
@@ -331,7 +371,7 @@ export class BlinkStick extends HidDevice {
      * @param {string} data 
      */
     setInfoBlock2(data) {
-        this.setInfoBlock(CONSTANTS.ADDRESS_BLOCK_2, data);
+        this.setInfoBlock(BlinkStick.ADDRESS.BLOCK_2, data);
     }
 
     /**
@@ -346,7 +386,7 @@ export class BlinkStick extends HidDevice {
      */
     getMode() {
         return new Promise((resolve, reject) => {
-            this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_MODE).then(buffer => {
+            this.getFeatureReport(BlinkStick.ADDRESS.BLOCK_MODE).then(buffer => {
                 resolve(buffer[1]);
             }).catch(e => reject(e))
         });
@@ -364,6 +404,6 @@ export class BlinkStick extends HidDevice {
      * @returns {void}
      */
     setMode(mode) {
-        this.hid.sendFeatureReport([CONSTANTS.ADDRESS_BLOCK_MODE, mode]);
+        this.hid.sendFeatureReport([BlinkStick.ADDRESS.BLOCK_MODE, mode]);
     }
 }

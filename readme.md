@@ -11,6 +11,7 @@ npm install blinkstick-node
 ## Usage
 
 ```js
+import Rgb from "../source/colors/Rgb.js";
 import { BlinkStick } from "blinkstick-node";
 
 const devices = BlinkStick.findAll();

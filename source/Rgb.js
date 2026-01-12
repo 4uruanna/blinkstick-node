@@ -1,8 +1,12 @@
-import CONSTANTS from "../constants.js";
-
 export default class Rgb
 {
+    static MIN = 0;
+
+    static MAX = 255;
+
     static BLACK = new Rgb(0, 0, 0);
+
+    static WHITE = new Rgb(255, 255, 255);
 
     static RED = new Rgb(255, 0, 0);
 
@@ -35,8 +39,8 @@ export default class Rgb
      */
     constructor(red, green, blue)
     {
-        this.red = Math.max(Math.min(red, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
-        this.green = Math.max(Math.min(green, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
-        this.blue = Math.max(Math.min(blue, CONSTANTS.MAX_RGB_VALUE), CONSTANTS.MIN_RGB_VALUE);
+        this.red = Math.max(Math.min(red, Rgb.MAX), Rgb.MIN);
+        this.green = Math.max(Math.min(green, Rgb.MAX), Rgb.MIN);
+        this.blue = Math.max(Math.min(blue, Rgb.MAX), Rgb.MIN);
     }
 }
