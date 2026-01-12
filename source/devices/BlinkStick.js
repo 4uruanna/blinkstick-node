@@ -178,6 +178,17 @@ export class BlinkStick extends HidDevice {
     }
 
     /**
+     * Set color of all leds
+     * 
+     * @param {Rgb} color
+     * @returns {Promise<void>}
+     */
+    async setLedsColor(color) {
+        const promises = Array(this.ledCount).keys().map(index => this.setLedColor(color, index));
+        await Promise.all(promises);
+    }
+
+    /**
      * Returns the serial number of device.
      *
      * ```
