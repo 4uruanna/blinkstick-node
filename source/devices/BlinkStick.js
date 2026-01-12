@@ -45,7 +45,10 @@ export class BlinkStick extends HidDevice {
     }
 
     /** @type {number} */
-    ledCount = 1;
+    ledCount;
+
+    /** @type {number} */
+    colorReportId;
 
     /**
      * @param {hid.Device} device
@@ -53,6 +56,16 @@ export class BlinkStick extends HidDevice {
     constructor(device)
     {
         super(device);
+        this.ledCount = this.getModel().ledCount;
+        this.colorReportId = (
+            this.ledCount < 8
+                    ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_8
+                    : this.ledCount < 16
+                        ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_16
+                        : this.ledCount < 32
+                            ? CONSTANTS.ADDRESS_BLOCK_GET_COLOR_32
+                            : CONSTANTS.ADDRESS_BLOCK_GET_COLOR_64
+        );
     }
 
     /**
@@ -110,7 +123,7 @@ export class BlinkStick extends HidDevice {
 
             if(this.isConnected()) {
                 const   cursor = index * 3 + 2,
-                        buffer = this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_GET_COLOR);
+                        buffer = this.getFeatureReport(this.colorReportId);
             
                 result = new Rgb(
                     buffer[cursor + 1],
@@ -131,14 +144,9 @@ export class BlinkStick extends HidDevice {
      * @returns {Promise<{ [key:number]: Rgb|undefined }>}
      */
     async getLedsColors() {
-        const   promises = [],
+        const   promises = Array(this.ledCount).keys().map(index => this.getLedColor(index)),
+                colors = await Promise.all(promises),
                 result = {};
-
-        for(const index of Array(this.ledCount).keys()) {
-            promises.push(this.getLedColor(index));
-        }
-
-        const colors = await Promise.all(promises);
 
         for(let i=0; i<colors.length; i++) {
             result[i] = colors[i];
@@ -197,7 +205,7 @@ export class BlinkStick extends HidDevice {
     /**
      * Get the product model of the device.
      *
-     * @return {{ id: number, release: undefined|number, name: string }}
+     * @return {{ id: number, release: undefined|number, name: string, ledCount: number }}
      */
     getModel() {
         const version = this.getVersion();
