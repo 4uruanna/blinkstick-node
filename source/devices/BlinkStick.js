@@ -276,7 +276,7 @@ export class BlinkStick extends HidDevice {
      * - 2 = WS2812
      * 
      * @see http://www.blinkstick.com/help/tutorials/blinkstick-pro-modes
-     * @returns {0|1|2}
+     * @returns {Promise<0|1|2>}
      */
     getMode() {
         return new Promise((resolve, reject) => {
@@ -284,5 +284,20 @@ export class BlinkStick extends HidDevice {
                 resolve(buffer[1]);
             }).catch(e => reject(e))
         });
+    }
+
+    /**
+     * Set mode for BlinkStick Pro
+     *
+     * - 0 = Normal
+     * - 1 = Inverse
+     * - 2 = WS2812
+     * 
+     * @see http://www.blinkstick.com/help/tutorials/blinkstick-pro-modes
+     * @param {0|1|2} mode
+     * @returns {void}
+     */
+    setMode(mode) {
+        this.hid.sendFeatureReport([CONSTANTS.ADDRESS_BLOCK_MODE, mode]);
     }
 }
