@@ -243,4 +243,28 @@ export class BlinkStick extends HidDevice {
 
         return result;
     }
+
+    /**
+     * Get the infoblock1 of the device.
+     * 
+     * This is a 32 byte array that can contain any data. It's supposed to
+     * hold the "Name" of the device making it easier to identify rather than
+     * a serial number.
+     * 
+     * @returns {Promise<number[]>}
+     */
+    getInfoBlock1() {
+        return this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_1);
+    }
+
+    /**
+     * Get the infoblock1 of the device.
+     * 
+     * This is a 32 byte array that can contain any data.
+     * 
+     * @returns {Promise<number[]>}
+     */
+    getInfoBlock2() {
+        return this.getFeatureReport(CONSTANTS.ADDRESS_BLOCK_2);
+    }
 }
