@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: black;
+        }
+
+        .blinkstick.square {
+            background-color: #101010;
+            height: 256px;
+            width: 256px;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr;
+            position: relative;
+        }
+
+        .led {
+            height: 48px;
+            width: 48px;
+            background-color: #000000;
+            border-radius: 12px;
+            position: absolute;
+        }
+
+        .led7 {
+            left: 72px;
+            top: 12px;
+        }
+
+        .led8 {
+            right: 72px;
+            top: 12px;
+        }
+
+        .led6 {
+            left: 12px;
+            top: 72px;
+        }
+
+        .led1 {
+            right: 12px;
+            top: 72px;
+        }
+
+        .led5 {
+            left: 12px;
+            bottom: 72px;
+        }
+
+        .led2 {
+            right: 12px;
+            bottom: 72px;
+        }
+
+        .led4 {
+            left: 72px;
+            bottom: 12px;
+        }
+
+        .led3 {
+            right: 72px;
+            bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="blinkstick square">
+        <div class="led led7" data-index="7"></div>
+        <div class="led led8" data-index="8"></div>
+
+        <div class="led led6" data-index="6"></div>
+        <div class="led led1" data-index="1"></div>
+
+        <div class="led led5" data-index="5"></div>
+        <div class="led led2" data-index="2"></div>
+
+        <div class="led led4" data-index="4"></div>
+        <div class="led led3" data-index="3"></div>
+    </div>
+</body>
+</html>
